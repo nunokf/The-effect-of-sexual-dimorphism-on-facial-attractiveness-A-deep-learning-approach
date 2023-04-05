@@ -1,0 +1,53 @@
+---
+title: "Untitled"
+author: "Nuno Fernandes"
+date: '2023-02-25'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+df = read.csv("C:\\Users\\nunok\\PycharmProjects\\pythonProject2\\datable_R.csv")
+
+```
+
+
+```{r}
+str(df)
+```
+
+```{r}
+library(lme4)
+library(afex) #for p-values
+m1=lmer(mean_predictions~congruent + sym+ gender + congruent*sym*gender + (1|parse), data = df)
+summary(m1)
+car::Anova(m1)
+```
+```{r}
+anova(m1)
+```
+
+```{r}
+library("report")
+report(m1)
+```
+
+```{r}
+library(emmeans)
+noise <- emmeans(m1,~congruent*sym*gender)
+
+
+x = contrast(noise, "pairwise", simple = "each", combine = TRUE, adjust="bonf")
+x
+```
+```{r}
+confint(x)
+```
+
+```{r}
+eff_size(noise, sigma=sigma(m1), edf = df.residual(m1))
+```
